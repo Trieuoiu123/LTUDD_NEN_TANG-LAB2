@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ProfileCraft — Editor</title>
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+</head>
+<body>
+  <!-- Loading screen -->
+  <div class="editor-loading" id="editor-loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Đang tải editor...</div>
+  </div>
+
+  <div class="editor-wrapper">
+    <!-- ======== TOP TOOLBAR ======== -->
+    <header class="editor-toolbar">
+      <div class="toolbar-left">
+        <a href="index.html" class="toolbar-brand" data-tooltip="Về trang chủ">
+          <div class="toolbar-brand-icon">P</div>
+        </a>
+
+        <!-- File Menu -->
+        <div class="toolbar-dropdown" id="file-menu">
+          <button class="toolbar-dropdown-btn" id="file-menu-btn">
+            File <span class="material-icons-round" style="font-size:14px">expand_more</span>
+          </button>
+          <div class="toolbar-dropdown-menu" id="file-menu-dropdown">
+            <div class="menu-item" data-action="new"><span class="material-icons-round">note_add</span> Mới <span class="shortcut">Ctrl+N</span></div>
+            <div class="menu-item" data-action="save"><span class="material-icons-round">save</span> Lưu <span class="shortcut">Ctrl+S</span></div>
+            <div class="menu-item" data-action="save-as"><span class="material-icons-round">save_as</span> Lưu thành...</div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-action="import"><span class="material-icons-round">upload_file</span> Import JSON</div>
+            <div class="menu-item" data-action="export-json"><span class="material-icons-round">download</span> Export JSON</div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-action="load"><span class="material-icons-round">folder_open</span> Mở project...</div>
+          </div>
+        </div>
+
+        <div class="divider-vertical"></div>
+
+        <!-- Undo / Redo -->
+        <button class="btn-icon" id="btn-undo" data-tooltip="Hoàn tác (Ctrl+Z)">
+          <span class="material-icons-round">undo</span>
+        </button>
+        <button class="btn-icon" id="btn-redo" data-tooltip="Làm lại (Ctrl+Shift+Z)">
+          <span class="material-icons-round">redo</span>
+        </button>
+
+        <div class="divider-vertical"></div>
+
+        <!-- Copy/Paste/Delete -->
+        <button class="btn-icon" id="btn-copy" data-tooltip="Sao chép (Ctrl+C)">
+          <span class="material-icons-round">content_copy</span>
+        </button>
+        <button class="btn-icon" id="btn-paste" data-tooltip="Dán (Ctrl+V)">
+          <span class="material-icons-round">content_paste</span>
+        </button>
+        <button class="btn-icon" id="btn-delete" data-tooltip="Xoá (Del)">
+          <span class="material-icons-round">delete_outline</span>
+        </button>
+      </div>
+
+      <div class="toolbar-center">
+        <input type="text" class="toolbar-project-name" id="project-name" value="Untitled Profile" spellcheck="false">
+      </div>
+
+      <div class="toolbar-right">
+        <!-- Zoom -->
+        <div class="zoom-controls">
+          <button class="btn-icon" id="btn-zoom-out" style="width:28px;height:28px">
+            <span class="material-icons-round" style="font-size:16px">remove</span>
+          </button>
+          <span class="zoom-value" id="zoom-value">100%</span>
+          <button class="btn-icon" id="btn-zoom-in" style="width:28px;height:28px">
+            <span class="material-icons-round" style="font-size:16px">add</span>
+          </button>
+          <button class="btn-icon" id="btn-zoom-fit" style="width:28px;height:28px" data-tooltip="Vừa màn hình">
+            <span class="material-icons-round" style="font-size:16px">fit_screen</span>
+          </button>
+        </div>
+
+        <div class="divider-vertical"></div>
+
+        <button class="btn-export" id="btn-export">
+          <span class="material-icons-round">download</span>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <!-- ======== MAIN CONTENT ======== -->
+    <main class="editor-main">
+      <!-- ---- Left Sidebar ---- -->
+      <aside class="editor-sidebar" id="editor-sidebar">
+        <div class="sidebar-tabs">
+          <button class="sidebar-tab active" data-panel="text">
+            <span class="material-icons-round">title</span>Text
+          </button>
+          <button class="sidebar-tab" data-panel="shapes">
+            <span class="material-icons-round">category</span>Shapes
+          </button>
+          <button class="sidebar-tab" data-panel="images">
+            <span class="material-icons-round">image</span>Images
+          </button>
+          <button class="sidebar-tab" data-panel="icons">
+            <span class="material-icons-round">emoji_symbols</span>Icons
+          </button>
+          <button class="sidebar-tab" data-panel="components">
+            <span class="material-icons-round">widgets</span>Profile
+          </button>
+          <button class="sidebar-tab" data-panel="templates-panel">
+            <span class="material-icons-round">dashboard</span>Mẫu
+          </button>
+        </div>
+
+        <div class="sidebar-content" id="sidebar-content">
+          <!-- TEXT Panel -->
+          <div class="sidebar-panel active" id="panel-text">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Thêm Text</div>
+              <div class="text-style-list">
+                <div class="text-style-item" data-add="heading">
+                  <span class="text-style-preview" style="font-size:22px;font-weight:700">Aa</span>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Heading</div>
+                    <div class="text-style-label">Outfit Bold 32px</div>
+                  </div>
+                </div>
+                <div class="text-style-item" data-add="subheading">
+                  <span class="text-style-preview" style="font-size:17px;font-weight:600">Aa</span>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Subheading</div>
+                    <div class="text-style-label">Outfit Semibold 20px</div>
+                  </div>
+                </div>
+                <div class="text-style-item" data-add="body">
+                  <span class="text-style-preview" style="font-size:13px;font-weight:400">Aa</span>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Body Text</div>
+                    <div class="text-style-label">Inter Regular 14px</div>
+                  </div>
+                </div>
+                <div class="text-style-item" data-add="custom">
+                  <span class="text-style-preview" style="font-size:15px;font-weight:500">T</span>
+                  <div>
+                    <div style="font-weight:600;font-size:13px">Custom Text</div>
+                    <div class="text-style-label">Tuỳ chỉnh font & size</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SHAPES Panel -->
+          <div class="sidebar-panel" id="panel-shapes" style="display:none">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Hình dạng cơ bản</div>
+              <div class="element-grid">
+                <div class="element-item" data-add="rect">
+                  <span class="material-icons-round">crop_square</span>
+                  Rectangle
+                </div>
+                <div class="element-item" data-add="circle">
+                  <span class="material-icons-round">circle</span>
+                  Circle
+                </div>
+                <div class="element-item" data-add="triangle">
+                  <span class="material-icons-round">change_history</span>
+                  Triangle
+                </div>
+                <div class="element-item" data-add="line">
+                  <span class="material-icons-round">horizontal_rule</span>
+                  Line
+                </div>
+                <div class="element-item" data-add="star">
+                  <span class="material-icons-round">star</span>
+                  Star
+                </div>
+                <div class="element-item" data-add="divider-line">
+                  <span class="material-icons-round">more_horiz</span>
+                  Divider
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- IMAGES Panel -->
+          <div class="sidebar-panel" id="panel-images" style="display:none">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Upload ảnh</div>
+              <div class="upload-area" id="upload-area">
+                <span class="material-icons-round">cloud_upload</span>
+                <div class="upload-area-text">Kéo ảnh vào đây hoặc click</div>
+                <div class="upload-area-hint">PNG, JPG, SVG — Max 5MB</div>
+                <input type="file" id="image-upload" accept="image/*" style="display:none" multiple>
+              </div>
+              <div class="uploaded-grid" id="uploaded-grid"></div>
+            </div>
+          </div>
+
+          <!-- ICONS Panel -->
+          <div class="sidebar-panel" id="panel-icons" style="display:none">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Social & Contact Icons</div>
+              <div class="icon-grid">
+                <div class="icon-item" data-icon="email" data-tooltip="Email">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 4h20v16H2V4zm2 2v1l8 5 8-5V6H4zm0 3.5V18h16V9.5l-8 5-8-5z"/></svg>
+                </div>
+                <div class="icon-item" data-icon="phone" data-tooltip="Phone">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.24 1.01l-2.2 2.2z"/></svg>
+                </div>
+                <div class="icon-item" data-icon="location" data-tooltip="Location">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+                </div>
+                <div class="icon-item" data-icon="linkedin" data-tooltip="LinkedIn">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14m-.5 15.5v-5.3a3.26 3.26 0 00-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 011.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 001.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 00-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                </div>
+                <div class="icon-item" data-icon="github" data-tooltip="GitHub">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0012 2z"/></svg>
+                </div>
+                <div class="icon-item" data-icon="globe" data-tooltip="Website">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- COMPONENTS Panel -->
+          <div class="sidebar-panel" id="panel-components" style="display:none">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Profile Components</div>
+              <div class="component-list">
+                <div class="component-item" data-component="avatar">
+                  <span class="material-icons-round">account_circle</span>
+                  <div>
+                    <div class="component-item-name">Avatar</div>
+                    <div class="component-item-desc">Ảnh đại diện tròn</div>
+                  </div>
+                </div>
+                <div class="component-item" data-component="contact-row">
+                  <span class="material-icons-round">contact_mail</span>
+                  <div>
+                    <div class="component-item-name">Contact Info</div>
+                    <div class="component-item-desc">Email, phone, location</div>
+                  </div>
+                </div>
+                <div class="component-item" data-component="section-header">
+                  <span class="material-icons-round">segment</span>
+                  <div>
+                    <div class="component-item-name">Section Header</div>
+                    <div class="component-item-desc">Tiêu đề section với accent line</div>
+                  </div>
+                </div>
+                <div class="component-item" data-component="skill-bar">
+                  <span class="material-icons-round">bar_chart</span>
+                  <div>
+                    <div class="component-item-name">Skill Bar</div>
+                    <div class="component-item-desc">Thanh tiến trình kỹ năng</div>
+                  </div>
+                </div>
+                <div class="component-item" data-component="social-links">
+                  <span class="material-icons-round">share</span>
+                  <div>
+                    <div class="component-item-name">Social Links</div>
+                    <div class="component-item-desc">LinkedIn, GitHub, Website</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TEMPLATES Panel -->
+          <div class="sidebar-panel" id="panel-templates-panel" style="display:none">
+            <div class="sidebar-section">
+              <div class="sidebar-section-title">Chuyển Template</div>
+              <div class="component-list" id="template-switch-list"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ---- Canvas Area ---- -->
+      <div class="canvas-area" id="canvas-area">
+        <div class="canvas-container" id="canvas-wrapper">
+          <canvas id="fabric-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- ---- Right Property Panel ---- -->
+      <aside class="property-panel" id="property-panel">
+        <div class="property-panel-header">
+          <span class="material-icons-round property-panel-icon">tune</span>
+          <span class="property-panel-title" id="prop-panel-title">Properties</span>
+        </div>
+        <div class="property-panel-content" id="property-panel-content">
+          <!-- No selection state -->
+          <div class="no-selection" id="no-selection">
+            <span class="material-icons-round">touch_app</span>
+            <p>Chọn một element trên canvas để chỉnh sửa thuộc tính</p>
+          </div>
+
+          <!-- Properties form (hidden by default) -->
+          <div id="properties-form" style="display:none">
+            <!-- Position & Size -->
+            <div class="property-section" id="section-position">
+              <div class="property-section-title">Vị trí & Kích thước</div>
+              <div class="property-row-2col">
+                <div class="property-input-group">
+                  <label>X</label>
+                  <input type="number" class="input-field" id="prop-x" step="1">
+                </div>
+                <div class="property-input-group">
+                  <label>Y</label>
+                  <input type="number" class="input-field" id="prop-y" step="1">
+                </div>
+              </div>
+              <div class="property-row-2col">
+                <div class="property-input-group">
+                  <label>W</label>
+                  <input type="number" class="input-field" id="prop-w" step="1">
+                </div>
+                <div class="property-input-group">
+                  <label>H</label>
+                  <input type="number" class="input-field" id="prop-h" step="1">
+                </div>
+              </div>
+              <div class="property-row">
+                <label>Rotation</label>
+                <input type="number" class="input-field" id="prop-angle" step="1" style="width:60px">
+                <span style="font-size:11px;color:var(--text-tertiary)">°</span>
+              </div>
+            </div>
+
+            <!-- Appearance -->
+            <div class="property-section" id="section-appearance">
+              <div class="property-section-title">Giao diện</div>
+              <div class="property-row">
+                <label>Fill</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="prop-fill" value="#6c5ce7">
+                  <input type="text" class="input-field" id="prop-fill-hex" style="width:80px" placeholder="#hex">
+                </div>
+              </div>
+              <div class="property-row">
+                <label>Stroke</label>
+                <div class="color-picker-wrapper">
+                  <input type="color" id="prop-stroke" value="#000000">
+                  <input type="text" class="input-field" id="prop-stroke-hex" style="width:80px" placeholder="#hex">
+                </div>
+              </div>
+              <div class="property-row">
+                <label style="min-width:48px">Stroke W</label>
+                <input type="range" id="prop-stroke-width" min="0" max="20" value="0" style="flex:1">
+                <span id="prop-stroke-width-val" style="font-size:11px;color:var(--text-tertiary);min-width:20px">0</span>
+              </div>
+              <div class="property-row">
+                <label style="min-width:48px">Opacity</label>
+                <input type="range" id="prop-opacity" min="0" max="100" value="100" style="flex:1">
+                <span id="prop-opacity-val" style="font-size:11px;color:var(--text-tertiary);min-width:30px">100%</span>
+              </div>
+              <div class="property-row">
+                <label style="min-width:48px">Radius</label>
+                <input type="range" id="prop-radius" min="0" max="50" value="0" style="flex:1">
+                <span id="prop-radius-val" style="font-size:11px;color:var(--text-tertiary);min-width:20px">0</span>
+              </div>
+            </div>
+
+            <!-- Text properties -->
+            <div class="property-section" id="section-text" style="display:none">
+              <div class="property-section-title">Text</div>
+              <select class="select-field" id="prop-font-family">
+                <option value="Inter">Inter</option>
+                <option value="Outfit">Outfit</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Open Sans">Open Sans</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Playfair Display">Playfair Display</option>
+                <option value="Lora">Lora</option>
+                <option value="Raleway">Raleway</option>
+                <option value="Source Code Pro">Source Code Pro</option>
+                <option value="Arial">Arial</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+              </select>
+              <div class="property-row-2col">
+                <div class="property-input-group">
+                  <label style="width:auto;font-size:10px">Size</label>
+                  <input type="number" class="input-field" id="prop-font-size" min="6" max="200" step="1">
+                </div>
+                <div class="property-input-group">
+                  <label style="width:auto;font-size:10px">Height</label>
+                  <input type="number" class="input-field" id="prop-line-height" min="0.5" max="3" step="0.1">
+                </div>
+              </div>
+              <div class="font-controls-row">
+                <button class="btn-icon" id="prop-bold" data-tooltip="Bold">
+                  <span class="material-icons-round">format_bold</span>
+                </button>
+                <button class="btn-icon" id="prop-italic" data-tooltip="Italic">
+                  <span class="material-icons-round">format_italic</span>
+                </button>
+                <button class="btn-icon" id="prop-underline" data-tooltip="Underline">
+                  <span class="material-icons-round">format_underlined</span>
+                </button>
+                <button class="btn-icon" id="prop-strikethrough" data-tooltip="Strikethrough">
+                  <span class="material-icons-round">strikethrough_s</span>
+                </button>
+              </div>
+              <div class="alignment-controls">
+                <button class="btn-icon" data-align="left" data-tooltip="Align Left">
+                  <span class="material-icons-round">format_align_left</span>
+                </button>
+                <button class="btn-icon" data-align="center" data-tooltip="Center">
+                  <span class="material-icons-round">format_align_center</span>
+                </button>
+                <button class="btn-icon" data-align="right" data-tooltip="Right">
+                  <span class="material-icons-round">format_align_right</span>
+                </button>
+                <button class="btn-icon" data-align="justify" data-tooltip="Justify">
+                  <span class="material-icons-round">format_align_justify</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Layers -->
+            <div class="property-section" id="section-layers">
+              <div class="property-section-title">Layer</div>
+              <div class="layer-controls">
+                <button class="layer-btn" id="btn-bring-front">
+                  <span class="material-icons-round">flip_to_front</span> Lên trước
+                </button>
+                <button class="layer-btn" id="btn-send-back">
+                  <span class="material-icons-round">flip_to_back</span> Về sau
+                </button>
+                <button class="layer-btn" id="btn-bring-top">
+                  <span class="material-icons-round">vertical_align_top</span> Lên đầu
+                </button>
+                <button class="layer-btn" id="btn-send-bottom">
+                  <span class="material-icons-round">vertical_align_bottom</span> Về cuối
+                </button>
+              </div>
+            </div>
+
+            <!-- Alignment -->
+            <div class="property-section" id="section-alignment">
+              <div class="property-section-title">Canvas Alignment</div>
+              <div class="layer-controls">
+                <button class="layer-btn" data-canvas-align="h-left">
+                  <span class="material-icons-round">align_horizontal_left</span> Left
+                </button>
+                <button class="layer-btn" data-canvas-align="h-center">
+                  <span class="material-icons-round">align_horizontal_center</span> Center
+                </button>
+                <button class="layer-btn" data-canvas-align="h-right">
+                  <span class="material-icons-round">align_horizontal_right</span> Right
+                </button>
+                <button class="layer-btn" data-canvas-align="v-center">
+                  <span class="material-icons-round">align_vertical_center</span> V-Center
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- ======== BOTTOM BAR ======== -->
+    <footer class="editor-bottombar">
+      <div class="bottombar-left">
+        <div class="autosave-indicator">
+          <div class="autosave-dot" id="autosave-dot"></div>
+          <span id="autosave-text">Saved</span>
+        </div>
+        <span id="canvas-size-info">794 × 1123 px</span>
+      </div>
+      <div class="bottombar-right">
+        <div class="zoom-slider-container">
+          <span style="font-size:11px">Zoom</span>
+          <input type="range" id="zoom-slider" min="25" max="200" value="100">
+          <span id="zoom-slider-value" style="font-size:11px;min-width:32px">100%</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ======== EXPORT MODAL ======== -->
+  <div class="modal-overlay" id="export-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Export Profile</h3>
+        <button class="btn-icon" id="export-modal-close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+
+      <div class="export-options">
+        <div class="export-option selected" data-format="png">
+          <span class="material-icons-round">image</span>
+          <div class="export-option-name">PNG</div>
+          <div class="export-option-desc">Chất lượng cao, nền trong suốt</div>
+        </div>
+        <div class="export-option" data-format="jpg">
+          <span class="material-icons-round">photo</span>
+          <div class="export-option-name">JPG</div>
+          <div class="export-option-desc">File nhỏ, phù hợp web</div>
+        </div>
+        <div class="export-option" data-format="pdf">
+          <span class="material-icons-round">picture_as_pdf</span>
+          <div class="export-option-name">PDF</div>
+          <div class="export-option-desc">Chuẩn A4, sẵn sàng in</div>
+        </div>
+        <div class="export-option" data-format="svg">
+          <span class="material-icons-round">code</span>
+          <div class="export-option-name">SVG</div>
+          <div class="export-option-desc">Vector, scale không giới hạn</div>
+        </div>
+      </div>
+
+      <div class="export-quality" id="export-quality-section">
+        <label>Chất lượng: <strong id="quality-label">2x (Cao)</strong></label>
+        <input type="range" id="export-quality" min="1" max="4" step="1" value="2">
+      </div>
+
+      <div class="export-actions">
+        <button class="btn btn-secondary" id="btn-export-cancel">Huỷ</button>
+        <button class="btn btn-primary" id="btn-export-confirm">
+          <span class="material-icons-round">download</span>
+          Tải xuống
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== SAVE MODAL ======== -->
+  <div class="modal-overlay" id="save-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Lưu Project</h3>
+        <button class="btn-icon" id="save-modal-close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div style="margin-bottom: var(--space-4)">
+        <label class="input-label">Tên project</label>
+        <input type="text" class="input-field" id="save-project-name" placeholder="My Profile">
+      </div>
+      <div class="export-actions">
+        <button class="btn btn-secondary" id="btn-save-cancel">Huỷ</button>
+        <button class="btn btn-primary" id="btn-save-confirm">
+          <span class="material-icons-round">save</span>
+          Lưu
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== LOAD MODAL ======== -->
+  <div class="modal-overlay" id="load-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Mở Project</h3>
+        <button class="btn-icon" id="load-modal-close">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div id="load-project-list" style="max-height:300px;overflow-y:auto"></div>
+      <div class="export-actions" style="margin-top:var(--space-4)">
+        <button class="btn btn-secondary" id="btn-load-cancel">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div class="context-menu" id="context-menu">
+    <div class="context-menu-item" data-action="copy"><span class="material-icons-round">content_copy</span> Copy <span class="shortcut">Ctrl+C</span></div>
+    <div class="context-menu-item" data-action="paste"><span class="material-icons-round">content_paste</span> Paste <span class="shortcut">Ctrl+V</span></div>
+    <div class="context-menu-item" data-action="duplicate"><span class="material-icons-round">control_point_duplicate</span> Duplicate <span class="shortcut">Ctrl+D</span></div>
+    <div class="context-menu-item" data-action="delete"><span class="material-icons-round">delete_outline</span> Delete <span class="shortcut">Del</span></div>
+    <div style="height:1px;background:var(--border-subtle);margin:4px 0"></div>
+    <div class="context-menu-item" data-action="bring-front"><span class="material-icons-round">flip_to_front</span> Bring Forward</div>
+    <div class="context-menu-item" data-action="send-back"><span class="material-icons-round">flip_to_back</span> Send Backward</div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+  <script src="js/templates.js"></script>
+  <script src="js/history.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/elements.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/toolbar.js"></script>
+  <script src="js/editor.js"></script>
+</body>
+</html>

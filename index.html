@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#00529c">
+  <meta name="description" content="VKU Field Survey PWA — Ứng dụng kiểm tra và khảo sát cơ sở vật chất Đại học CNTT & TT Việt - Hàn hoạt động 100% Offline-First.">
+  <title>VKU Field Survey — Khảo sát Cơ sở Vật chất PWA</title>
+  
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+  
+  <!-- Google Fonts & Material Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="brand">
+      <div class="brand-icon">VKU</div>
+      <div>
+        <div class="brand-title">Field Survey PWA</div>
+        <div class="brand-subtitle">Khảo sát Cơ sở Vật chất</div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <!-- Live Network Status Badge -->
+      <div id="network-status-badge" class="network-badge online">
+        <span class="status-dot"></span>
+        <span id="network-status-text">Online</span>
+      </div>
+
+      <!-- Theme Switcher -->
+      <button class="btn-icon" id="btn-theme-toggle" title="Chuyển chế độ Sáng/Tối">
+        <span class="material-icons-round">dark_mode</span>
+      </button>
+
+      <!-- Install PWA Button -->
+      <button class="btn-icon" id="btn-install-pwa" style="display: none;" title="Cài đặt PWA">
+        <span class="material-icons-round" style="color: var(--vku-cyan);">get_app</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="app-container">
+
+    <!-- TAB 1: FORM KHẢO SÁT MỚI -->
+    <section id="tab-form" class="tab-view active">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="material-icons-round" style="color: var(--vku-cyan);">edit_note</span>
+          Tạo Phiếu Khảo Sát
+        </h2>
+        <p class="section-desc">Ghi nhận thông tin kiểm tra cơ sở vật chất (Hoạt động 100% Offline)</p>
+      </div>
+
+      <form id="survey-form" onsubmit="event.preventDefault();">
+        <div class="card">
+          <!-- Zone Selection -->
+          <div class="form-group">
+            <label class="form-label">Khu Vực Campus VKU *</label>
+            <select class="form-select" id="field-zone" required>
+              <option value="Khu A - Tòa Nhà Hành Chính">Khu A - Tòa Nhà Hành Chính</option>
+              <option value="Khu B - Giảng Đường">Khu B - Giảng Đường Trung Tâm</option>
+              <option value="Khu C - Ký Túc Xá">Khu C - Ký Túc Xá Sinh Viên</option>
+              <option value="Khu D - Khu Thể Thao">Khu D - Nhà Đa Năng & Sân Thể Thao</option>
+              <option value="Khu E - Thư Viện & CNTT" selected>Khu E - Trung tâm Thư viện & CNTT</option>
+              <option value="Khu Xưởng & Phòng Lab">Khu Xưởng Thực Hành & Lab Chuyên Sâu</option>
+            </select>
+          </div>
+
+          <!-- Room Code -->
+          <div class="form-group">
+            <label class="form-label">Mã Phòng / Vị Trí Cụ Thể *</label>
+            <input type="text" class="form-control" id="field-room" placeholder="Ví dụ: Phòng E.201, Lab AI, KTX C2-305..." required>
+          </div>
+
+          <!-- Facility Category -->
+          <div class="form-group">
+            <label class="form-label">Loại Thiết Bị / Cơ Sở Vật Chất *</label>
+            <select class="form-select" id="field-facility" required>
+              <option value="Bàn ghế / Nội thất">Bàn ghế & Nội thất</option>
+              <option value="Máy chiếu & Màn hình">Máy chiếu & Màn hình trình chiếu</option>
+              <option value="Điều hòa & Quạt">Điều hòa & Hệ thống làm mát</option>
+              <option value="Điện & Chiếu sáng">Thiết bị Điện & Đèn chiếu sáng</option>
+              <option value="Mạng & Wifi">Hạ tầng Mạng & Wifi Campus</option>
+              <option value="Cửa & Khung kính">Cửa ra vào, Cửa sổ & Kính</option>
+              <option value="Thiết bị Vệ sinh">Thiết bị Vệ sinh & Cấp thoát nước</option>
+              <option value="Khác">Khác / Cơ sở hạ tầng chung</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Condition Rating Selector -->
+        <div class="card">
+          <label class="form-label">Đánh Giá Tình Trạng *</label>
+          <div class="condition-grid">
+            <div class="condition-card selected" data-condition="good" onclick="selectCondition('good')">
+              <span class="icon">🟢</span>
+              <div class="title">Bình Thường</div>
+            </div>
+            <div class="condition-card" data-condition="minor" onclick="selectCondition('minor')">
+              <span class="icon">🟡</span>
+              <div class="title">Hỏng Nhẹ</div>
+            </div>
+            <div class="condition-card" data-condition="critical" onclick="selectCondition('critical')">
+              <span class="icon">🔴</span>
+              <div class="title">Hỏng Nặng</div>
+            </div>
+          </div>
+          <input type="hidden" id="field-condition" value="good">
+        </div>
+
+        <!-- Priority Chips -->
+        <div class="card">
+          <label class="form-label">Mức Độ Ưu Tiên Xử Lý</label>
+          <div class="chip-group" id="priority-chip-group">
+            <div class="chip active" data-priority="low" onclick="selectPriority('low')">🟢 Thấp</div>
+            <div class="chip" data-priority="medium" onclick="selectPriority('medium')">🟡 Trung Bình</div>
+            <div class="chip" data-priority="high" onclick="selectPriority('high')">🟠 Cao</div>
+            <div class="chip" data-priority="urgent" onclick="selectPriority('urgent')">🔴 Khẩn Cấp</div>
+          </div>
+          <input type="hidden" id="field-priority" value="low">
+        </div>
+
+        <!-- Details / Description -->
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">Mô Tả Chi Tiết Sự Cố / Ghi Chú</label>
+            <textarea class="form-control" id="field-notes" rows="3" placeholder="Mô tả chi tiết tình trạng hỏng hóc hoặc yêu cầu bảo trì..."></textarea>
+          </div>
+        </div>
+
+        <!-- Photo Capture / Dropzone -->
+        <div class="card">
+          <label class="form-label">Hình Ảnh Minh Họa (Chụp từ Camera hoặc chọn từ máy)</label>
+          <div class="photo-uploader" onclick="document.getElementById('photo-file-input').click();">
+            <span class="material-icons-round" style="font-size: 2.5rem; color: var(--vku-cyan);">photo_camera</span>
+            <div style="font-size: 0.88rem; font-weight: 600; margin-top: 6px;">Chụp ảnh / Tải ảnh minh họa</div>
+            <div style="font-size: 0.75rem; color: var(--text-sub);">Lưu trực tiếp vào bộ nhớ Offline thiết bị</div>
+          </div>
+          <input type="file" id="photo-file-input" accept="image/*" capture="environment" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+          
+          <div class="preview-grid" id="photo-preview-grid"></div>
+        </div>
+
+        <!-- Geo-Location Capture -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <label class="form-label" style="margin-bottom: 0;">Vị Trí GPS</label>
+              <div id="gps-status-text" style="font-size: 0.8rem; color: var(--text-sub);">Chưa xác định tọa độ</div>
+            </div>
+            <button type="button" class="btn-secondary" style="width: auto; padding: 6px 12px;" onclick="getGPSLocation()">
+              <span class="material-icons-round" style="font-size: 1rem;">my_location</span>
+              Lấy GPS
+            </button>
+          </div>
+          <input type="hidden" id="field-gps" value="">
+        </div>
+
+        <!-- Surveyor Information -->
+        <div class="card">
+          <div class="form-group" style="margin-bottom: 10px;">
+            <label class="form-label">Họ & Tên Người Khảo Sát</label>
+            <input type="text" class="form-control" id="field-surveyor-name" placeholder="Nhập họ tên...">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="form-label">Mã SV / Thẻ Cán Bộ</label>
+            <input type="text" class="form-control" id="field-surveyor-id" placeholder="Ví dụ: 21IT001...">
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-primary" onclick="submitSurveyForm()">
+          <span class="material-icons-round">save</span>
+          Lưu Báo Cáo Offline
+        </button>
+      </form>
+    </section>
+
+    <!-- TAB 2: DANH SÁCH BÁO CÁO -->
+    <section id="tab-records" class="tab-view">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="material-icons-round" style="color: var(--vku-cyan);">assignment</span>
+          Danh Sách Báo Cáo
+        </h2>
+        <p class="section-desc">Tất cả khảo sát đã lưu trong IndexedDB cục bộ</p>
+      </div>
+
+      <!-- Search & Filter Controls -->
+      <div class="search-box">
+        <span class="material-icons-round">search</span>
+        <input type="text" class="form-control" id="records-search" placeholder="Tìm theo phòng, khu vực, thiết bị..." oninput="filterRecords()">
+      </div>
+
+      <div class="chip-group" style="margin-bottom: 16px;">
+        <div class="chip active" data-filter="all" onclick="setRecordFilter('all')">Tất cả</div>
+        <div class="chip" data-filter="pending_sync" onclick="setRecordFilter('pending_sync')">🟡 Chờ đồng bộ</div>
+        <div class="chip" data-filter="good" onclick="setRecordFilter('good')">🟢 Tốt</div>
+        <div class="chip" data-filter="minor" onclick="setRecordFilter('minor')">🟡 Hỏng nhẹ</div>
+        <div class="chip" data-filter="critical" onclick="setRecordFilter('critical')">🔴 Hỏng nặng</div>
+      </div>
+
+      <!-- Records List -->
+      <div id="records-list-container">
+        <!-- Records injected by JS -->
+      </div>
+    </section>
+
+    <!-- TAB 3: THỐNG KÊ & DASHBOARD -->
+    <section id="tab-dashboard" class="tab-view">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="material-icons-round" style="color: var(--vku-cyan);">analytics</span>
+          Thống Kê Cơ Sở Vật Chất
+        </h2>
+        <p class="section-desc">Tổng quan hiện trạng hạ tầng campus VKU</p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Tổng Phiếu Khảo Sát</div>
+          <div class="metric-value" id="dash-total">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Chờ Đồng Bộ Cloud</div>
+          <div class="metric-value" id="dash-pending" style="color: var(--color-minor);">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Thiết Bị Tốt 🟢</div>
+          <div class="metric-value" id="dash-good" style="color: var(--color-good);">0</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Sự Cố Khẩn Cấp 🔴</div>
+          <div class="metric-value" id="dash-critical" style="color: var(--color-critical);">0</div>
+        </div>
+      </div>
+
+      <!-- Campus Facility Health Card -->
+      <div class="card" style="text-align: center;">
+        <h3 style="font-size: 1rem; margin-bottom: 8px;">Chỉ Số Tình Trạng Cơ Sở Vật Chất</h3>
+        <div id="health-score-text" style="font-size: 2.8rem; font-weight: 800; color: var(--color-good);">100%</div>
+        <div style="height: 10px; background: var(--bg-input); border-radius: 10px; overflow: hidden; margin-top: 10px;">
+          <div id="health-bar-fill" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--color-good), var(--vku-accent)); transition: width 0.5s ease;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: LÝ THUYẾT & KIẾN THỨC PWA (SLIDES INTEGRATION) -->
+    <section id="tab-pwa-hub" class="tab-view">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="material-icons-round" style="color: var(--vku-cyan);">school</span>
+          Lý Thuyết & Kiến Thức PWA
+        </h2>
+        <p class="section-desc">Tổng hợp bài giảng về Progressive Web App</p>
+      </div>
+
+      <!-- Slide 1: 5 Criteria of a PWA -->
+      <div class="pwa-slide-card">
+        <span class="slide-badge">SLIDE 1</span>
+        <h3 style="font-size: 1.1rem; margin-bottom: 6px;">5 Criteria of a PWA (5 Tiêu chí PWA)</h3>
+        <div class="criteria-list">
+          <div class="criteria-item">
+            <span class="criteria-icon">📱</span>
+            <div>
+              <strong>Installable:</strong> Thêm vào màn hình chính với icon khởi chạy độc lập như app Native.
+            </div>
+          </div>
+          <div class="criteria-item">
+            <span class="criteria-icon">🔌</span>
+            <div>
+              <strong>Offline-First:</strong> Hoạt động ổn định không cần kết nối mạng qua Service Worker + Cache API.
+            </div>
+          </div>
+          <div class="criteria-item">
+            <span class="criteria-icon">⚡</span>
+            <div>
+              <strong>Fast & Responsive:</strong> Khởi động dưới 1 giây từ local cache, tối ưu cho mọi kích thước màn hình mobile.
+            </div>
+          </div>
+          <div class="criteria-item">
+            <span class="criteria-icon">🔔</span>
+            <div>
+              <strong>Engaging:</strong> Hỗ trợ Web Push notifications và Badging API.
+            </div>
+          </div>
+          <div class="criteria-item">
+            <span class="criteria-icon">🔒</span>
+            <div>
+              <strong>Secure:</strong> Truyền tải an toàn qua HTTPS.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: PWA vs. Native App Comparison -->
+      <div class="pwa-slide-card">
+        <span class="slide-badge">SLIDE 2</span>
+        <h3 style="font-size: 1.1rem; margin-bottom: 6px;">PWA vs. Native App Comparison</h3>
+        <p style="font-size: 0.8rem; color: var(--text-sub);">Bảng so sánh chi tiết giữa Progressive Web App và Native Mobile App</p>
+
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Progressive Web App</th>
+                <th>Native Mobile App</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Distribution</strong></td>
+                <td>Direct URL / Web Link</td>
+                <td>Google Play / App Store</td>
+              </tr>
+              <tr>
+                <td><strong>App Store Fee</strong></td>
+                <td><span style="color: var(--color-good); font-weight:700;">0% Fee</span></td>
+                <td>15% – 30% Fee</td>
+              </tr>
+              <tr>
+                <td><strong>Updates</strong></td>
+                <td>Instant (via Service Worker)</td>
+                <td>Store Review (1–3 Days)</td>
+              </tr>
+              <tr>
+                <td><strong>Bundle Size</strong></td>
+                <td>1 – 5 MB</td>
+                <td>25 – 80 MB</td>
+              </tr>
+              <tr>
+                <td><strong>Hardware Access</strong></td>
+                <td>Good (Camera, GPS, Storage)</td>
+                <td>Full (BLE, NFC, Biometrics)</td>
+              </tr>
+              <tr>
+                <td><strong>Offline Support</strong></td>
+                <td>Cache API + IndexedDB</td>
+                <td>Local SQLite / File System</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Slide 3: Service Worker Lifecycle -->
+      <div class="pwa-slide-card">
+        <span class="slide-badge">SLIDE 3</span>
+        <h3 style="font-size: 1.1rem; margin-bottom: 6px;">Service Worker Lifecycle (Vòng đời SW)</h3>
+        <div class="lifecycle-flow">
+          <div class="lifecycle-step">
+            <strong>1. Register in main.js:</strong> Khởi tạo đăng ký Service Worker từ file JavaScript chính.
+          </div>
+          <div class="lifecycle-step">
+            <strong>2. ( Install Event ):</strong> Pre-cache core App Shell assets (HTML, CSS, JS, Icons) vào CacheStorage.
+          </div>
+          <div class="lifecycle-step">
+            <strong>3. ( Activate Event ):</strong> Dọn dẹp phiên bản cache cũ bị deprecated và tiếp quản điều khiển.
+          </div>
+          <div class="lifecycle-step">
+            <strong>4. ( Fetch Event ):</strong> Intercept HTTP requests và áp dụng các chiến lược Caching.
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: 5 Core Caching Strategies -->
+      <div class="pwa-slide-card">
+        <span class="slide-badge">SLIDE 4</span>
+        <h3 style="font-size: 1.1rem; margin-bottom: 6px;">5 Core Caching Strategies</h3>
+
+        <div class="strategy-card">
+          <div class="strategy-title">1. Cache-First (App Shell)</div>
+          <div class="strategy-desc">Kiểm tra Cache trước; nếu tìm thấy trả về ngay lập tức; nếu không thì fetch từ network. Tối ưu cho giao diện tĩnh.</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">2. Network-First (Live Data)</div>
+          <div class="strategy-desc">Thử gửi network request mới; fallback về Cache khi mất mạng (Offline). Tối ưu cho dữ liệu biến động.</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">3. Stale-While-Revalidate (Feed)</div>
+          <div class="strategy-desc">Trả về ngay kết quả cached cũ đồng thời âm thầm fetch cập nhật mới ở background.</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">4. Cache-Only</div>
+          <div class="strategy-desc">Chỉ truy xuất tài nguyên đã được pre-cache hoàn toàn offline.</div>
+        </div>
+
+        <div class="strategy-card">
+          <div class="strategy-title">5. Network-Only</div>
+          <div class="strategy-desc">Truyền thẳng qua network cho các request giao dịch không cache (e.g. Auth Tokens).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: ĐỒNG BỘ & CÀI ĐẶT -->
+    <section id="tab-settings" class="tab-view">
+      <div class="section-header">
+        <h2 class="section-title">
+          <span class="material-icons-round" style="color: var(--vku-cyan);">settings</span>
+          Đồng Bộ & Hệ Thống
+        </h2>
+        <p class="section-desc">Quản lý đồng bộ Cloud, Xuất dữ liệu & Thử nghiệm PWA</p>
+      </div>
+
+      <!-- Google Sheets Integration Card -->
+      <div class="card" style="border-color: rgba(16, 185, 129, 0.4);">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+          <span class="material-icons-round" style="color: var(--color-good); font-size: 1.5rem;">table_chart</span>
+          <h3 style="font-size: 1rem;">Liên Kết Google Sheets (Thời Gian Thực)</h3>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-sub); margin-bottom: 12px;">
+          Tự động đồng bộ báo cáo khảo sát trực tiếp vào trang tính Google Sheets của bạn.
+        </p>
+
+        <div class="form-group">
+          <label class="form-label">Google Apps Script Web App URL</label>
+          <input type="url" class="form-control" id="gsheet-url-input" placeholder="https://script.google.com/macros/s/.../exec">
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <button type="button" class="btn-primary" style="background: linear-gradient(135deg, #10b981, #059669);" onclick="saveGoogleSheetURL()">
+            <span class="material-icons-round">save</span>
+            Lưu URL Webhook
+          </button>
+          <button type="button" class="btn-secondary" onclick="toggleGSheetInstructions()">
+            <span class="material-icons-round">help_outline</span>
+            Hướng Dẫn Tạo Code
+          </button>
+        </div>
+
+        <!-- Instructions Box (Collapsible) -->
+        <div id="gsheet-instructions-box" style="display: none; background: var(--bg-input); padding: 14px; border-radius: var(--radius-md); font-size: 0.82rem; margin-top: 10px; border: 1px solid var(--border-color);">
+          <strong style="color: var(--vku-cyan);">Các bước tạo Webhook kết nối Google Sheets:</strong>
+          <ol style="margin-left: 18px; margin-top: 6px; margin-bottom: 10px; line-height: 1.6;">
+            <li>Mở file **Google Sheets** của bạn.</li>
+            <li>Vào menu **Tiện ích mở rộng (Extensions)** ➔ **Apps Script**.</li>
+            <li>Dán toàn bộ đoạn mã bên dưới vào và lưu lại (`Ctrl + S`):</li>
+          </ol>
+
+          <pre style="background: #090d16; color: #38bdf8; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 0.75rem; user-select: all;" id="apps-script-code">
+function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow([
+        "Mã Báo Cáo", "Thời Gian", "Khu Vực", "Mã Phòng", 
+        "Loại Thiết Bị", "Tình Trạng", "Mức Ưu Tiên", "Ghi Chú", 
+        "GPS", "Người Khảo Sát", "Mã SV/NV", "Trạng Thái"
+      ]);
+    }
+    var gpsStr = data.gps ? (data.gps.latitude + ", " + data.gps.longitude) : "N/A";
+    sheet.appendRow([
+      data.id || "",
+      data.timestamp || new Date().toISOString(),
+      data.locationZone || "",
+      data.roomCode || "",
+      data.facilityType || "",
+      data.condition || "",
+      data.priority || "",
+      data.notes || "",
+      gpsStr,
+      data.surveyorName || "",
+      data.surveyorId || "",
+      "VKU PWA Synced"
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+          </pre>
+
+          <ol start="4" style="margin-left: 18px; margin-top: 10px; line-height: 1.6;">
+            <li>Bấm **Triển khai (Deploy)** ➔ **Triển khai dưới dạng ứng dụng web (New Deployment)**.</li>
+            <li>Tại mục *Ai có quyền truy cập (Who has access)* ➔ Chọn **Bất kỳ ai (Anyone)**.</li>
+            <li>Copy đường link **URL ứng dụng web** dán vào ô bên trên!</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Sync Card -->
+      <div class="card">
+        <h3 style="font-size: 1rem; margin-bottom: 8px;">Đồng Bộ Báo Cáo Offline</h3>
+        <p style="font-size: 0.82rem; color: var(--text-sub); margin-bottom: 12px;">Đồng bộ tất cả phiếu khảo sát đang chờ (`pending_sync`) lên Google Sheets & Cloud khi có Internet.</p>
+        <button type="button" class="btn-primary" onclick="syncDataWithCloud()">
+          <span class="material-icons-round">cloud_upload</span>
+          Đồng Bộ Google Sheets & Cloud Ngay
+        </button>
+      </div>
+
+      <!-- Export Card -->
+      <div class="card">
+        <h3 style="font-size: 1rem; margin-bottom: 10px;">Xuất & Dữ Liệu Báo Cáo</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" class="btn-secondary" onclick="exportDataJSON()">
+            <span class="material-icons-round">file_download</span>
+            Xuất File JSON (Backup)
+          </button>
+          <button type="button" class="btn-secondary" onclick="exportDataCSV()">
+            <span class="material-icons-round">table_chart</span>
+            Xuất File CSV / Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- Demo Seed Data Card -->
+      <div class="card">
+        <h3 style="font-size: 1rem; margin-bottom: 10px;">Công Cụ Thử Nghiệm (Demo & Badging)</h3>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <button type="button" class="btn-secondary" onclick="triggerSeedDemoData()">
+            <span class="material-icons-round">playlist_add</span>
+            Tạo Dữ Liệu Mẫu Campus VKU (4 Phiếu)
+          </button>
+          <button type="button" class="btn-secondary" onclick="requestPushNotificationPermission()">
+            <span class="material-icons-round">notifications</span>
+            Bật Thông Báo Web Push & App Badging
+          </button>
+          <button type="button" class="btn-secondary" style="color: var(--color-critical); border-color: rgba(239,68,68,0.3);" onclick="clearAllData()">
+            <span class="material-icons-round">delete_forever</span>
+            Xóa Toàn Bộ Dữ Liệu Local
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('tab-form', this)">
+      <span class="material-icons-round">edit_note</span>
+      <span>Khảo sát</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-records', this)">
+      <span class="material-icons-round">assignment</span>
+      <span>Báo cáo</span>
+      <span class="nav-badge" id="records-count-badge" style="display: none;">0</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-dashboard', this)">
+      <span class="material-icons-round">analytics</span>
+      <span>Thống kê</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-pwa-hub', this)">
+      <span class="material-icons-round">school</span>
+      <span>Lý thuyết</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('tab-settings', this)">
+      <span class="material-icons-round">settings</span>
+      <span>Đồng bộ</span>
+    </div>
+  </nav>
+
+  <!-- Detail Modal Sheet -->
+  <div class="modal-overlay" id="modal-record-detail" onclick="if(event.target === this) closeModal();">
+    <div class="modal-sheet">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 id="modal-detail-title" style="font-size: 1.1rem;">Chi Tiết Báo Cáo</h3>
+        <button class="btn-icon" onclick="closeModal()">
+          <span class="material-icons-round">close</span>
+        </button>
+      </div>
+      <div id="modal-detail-body">
+        <!-- Content injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
