@@ -1,0 +1,26 @@
+{
+  "name": "week2",
+  "version": "1.0.0",
+  "description": "> **Mini-Project 1**: Progressive Web App (PWA) di động kiểm tra và khảo sát cơ sở vật chất Trường Đại học CNTT & TT Việt - Hàn (VKU), hoạt động **100% Offline-First (Zero Network Connectivity)** và tích hợp đồng bộ thời gian thực với **Google Sheets**.",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trieuoiu123/lab1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Trieuoiu123/lab1/issues"
+  },
+  "homepage": "https://github.com/Trieuoiu123/lab1#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}
