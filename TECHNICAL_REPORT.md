@@ -1,93 +1,105 @@
-# BÁO CÁO KỸ THUẬT TẮT DỰ ÁN MINI-PROJECT
-**Môn học:** Phát Triển Ứng Dụng Di Động Đa Nền Tảng (VKU)  
-**Tên Mini-Project:** Mini-Project 1: VKU Field Survey PWA (Khảo sát Cơ sở Vật chất Campus VKU)  
-**Tên Nhóm / Sinh viên:** Nguyễn Văn Triệu  
-**Ngày nộp:** 14/09/2026  
+# MINI-PROJECT SHORT TECHNICAL REPORT
+
+**Course:** Cross-Platform Mobile App Development (VKU)  
+**Mini-Project Title:** Mini-Project 1: VKU Field Survey PWA & Android Application  
+**Team / Student Name:** Trần Kim Bá Triều  
+**Submission Date:** 21/09/2026  
 
 ---
 
-## 1. THÔNG TIN CHUNG & CÁC ĐƯỜNG LINK DỰ ÁN
+## 1. GENERAL INFORMATION & DELIVERABLE LINKS
 
-* **Thành viên nhóm:**
-  1. Nguyễn Văn Triệu — Mã SV: 21IT001 — Vai trò: Kiến trúc PWA & Phát triển Full-Stack — Đóng góp: 100%
-* **🔗 Live Demo URL:** [https://trieuoiu123.github.io/lab1/](https://trieuoiu123.github.io/lab1/)
-* **💻 GitHub Repository:** [https://github.com/Trieuoiu123/lab1](https://github.com/Trieuoiu123/lab1)
-* **🎥 Video Demo (Option):** N/A
+* **Team Members:**
+  * **Trần Kim Bá Triều** — Student ID: **23IT287** — Role: **Full-Stack PWA & Android Developer** — Contribution: **100%**
 
----
-
-## 2. BẢNG CHECKLIST TÍNH NĂNG ĐÃ TRIỂN KHAI
-
-| # | Tính năng Yêu cầu | Trạng thái | Chi tiết Triển khai & Mức độ Đạt |
-|:---:|---|:---:|---|
-| 1 | **Giao diện Responsive Mobile & Dark Mode** | ✅ Hoàn thành | 100% responsive chuẩn Mobile-First với Thanh điều hướng đáy (Bottom Nav 5 Tabs), các nút bấm cảm ứng lớn, tùy chỉnh giao diện Sáng/Tối linh hoạt. |
-| 2 | **Lưu trữ Cục bộ Offline Persistence** | ✅ Hoàn thành | Sử dụng **IndexedDB (`VKUSurveyDB`)** lưu trữ dữ liệu khảo sát, hình ảnh chụp nén Base64 và tọa độ GPS ngoại mạng 100% không cần Internet. |
-| 3 | **Đồng bộ Tự động & Real-time Google Sheets** | ✅ Hoàn thành | Tự động hoặc thủ công đồng bộ các phiếu chờ (`pending_sync`) trực tiếp vào trang tính **Google Sheets** qua Webhook Google Apps Script khi có mạng. |
-| 4 | **Cài đặt PWA & Service Worker Lifecycle** | ✅ Hoàn thành | File `manifest.json` chuẩn standalone PWA, `sw.js` triển khai 5 chiến lược caching (Cache-First, Network-First, Stale-While-Revalidate, Cache-Only, Network-Only). |
-| 5 | **Truy cập Phần cứng Camera & GPS** | ✅ Hoàn thành | Chụp ảnh camera nén client-side canvas, lấy tọa độ GPS chính xác (Geolocation API) và hiển thị thông báo hiệu Badging API (`navigator.setAppBadge`). |
-| 6 | **Xuất Báo cáo JSON / CSV / PDF** | ✅ Hoàn thành | Hỗ trợ xuất dữ liệu backup JSON, file Excel/CSV và in phiếu kiểm tra cơ sở vật chất PDF chuẩn định dạng báo cáo VKU. |
+* **🔗 Live Demo URL:** [http://localhost:8080](http://localhost:8080) (Local PWA Server)
+* **💻 GitHub Repository:** [https://github.com/Trieuoiu123/LTUDD_NEN_TANG-LAB2.git](https://github.com/Trieuoiu123/LTUDD_NEN_TANG-LAB2.git)
+* **📱 Android APK Package:** `android/app/build/outputs/apk/debug/app-debug.apk`
+* **🎥 Video Demo (Optional):** N/A
 
 ---
 
-## 3. KIẾN TRÚC KỸ THUẬT & CẤU TRÚC DỰ ÁN
+## 2. FEATURE IMPLEMENTATION CHECKLIST
 
-### 📁 Cấu trúc thư mục mã nguồn
+| # | Required Feature | Status | Implementation Details & Acceptance Level |
+|---|---|:---:|---|
+| **1** | **Responsive Mobile Viewport & Dark Mode** | ✅ Complete | 100% responsive across mobile viewports with 5-Tab Bottom Navigation Bar, touch-friendly UI, real-time Online/Offline indicator, and smooth Dark/Light mode toggling. |
+| **2** | **Local Offline Persistence** | ✅ Complete | Uses **IndexedDB (`VKUSurveyDB`)** for client-side storage, saving offline survey logs, base64 compressed images, and GPS coordinates without network dependency. |
+| **3** | **Automatic Background & Cloud Sync** | ✅ Complete | Auto-queues pending payloads (`pending_sync`) and syncs them in real-time to **Google Sheets** via Google Apps Script Webhook when network connectivity is restored. |
+| **4** | **PWA Capabilities & Caching** | ✅ Complete | Full PWA compliance (`manifest.json`) and Service Worker (`sw.js`) implementing 5 core caching strategies (Cache-First, Network-First, Stale-While-Revalidate, Cache-Only, Network-Only). |
+| **5** | **Hardware Access (Camera & GPS)** | ✅ Complete | Real-time photo capture with client-side Canvas image compression (<800px), Geolocation API auto-locator with VKU Campus fallback coordinates, and Badging API (`navigator.setAppBadge`). |
+| **6** | **Native Android App Packaging** | ✅ Complete | Packaged into a full native Android project using **Capacitor 7** & compiled into `app-debug.apk` via Gradle with native Android permissions (`CAMERA`, `GPS`, `INTERNET`). |
+
+---
+
+## 3. TECHNICAL ARCHITECTURE & PROJECT STRUCTURE
+
+### 📁 Directory Structure
 ```
-cross_platform_application_development/week2/
-├── index.html          # Giao diện HTML5 Semantic 5 Tabs Mobile Viewport
+LTUDD_NEN_TANG-LAB2/
+├── index.html              # Main HTML5 Semantic UI (Mobile 5 Tabs, FAB, Real-time status)
+├── editor.html             # Data management & survey inspection interface
+├── generate-icons.html     # PWA launcher icon generation utility
 ├── css/
-│   └── index.css       # Design System, VKU Brand Colors (#00529C), Responsive & Dark Theme
+│   └── index.css           # Design System, VKU Brand Colors (#00529C), Responsive & Dark Mode
 ├── js/
-│   ├── app.js          # Quản lý State, Sự kiện, Camera, GPS, Bộ lọc & Engine Đồng bộ Google Sheets
-│   └── storage.js      # Storage Engine thao tác với CSDL Cục bộ IndexedDB (VKUSurveyDB)
-├── sw.js               # Service Worker triển khai 5 chiến lược caching & SW Lifecycle
-├── manifest.json       # Web App Manifest hỗ trợ cài đặt PWA Standalone & Shortcuts
-├── README.md           # Hướng dẫn chi tiết dự án & Cấu hình Google Apps Script
-└── BAO_CAO_DU_AN.md    # Báo cáo kỹ thuật tổng hợp
+│   ├── app.js              # Core PWA Logic, Event listeners, Camera, GPS, Filter & Sync Engine
+│   └── storage.js          # Storage Engine managing IndexedDB (VKUSurveyDB)
+├── sw.js                   # Service Worker script managing PWA lifecycle & 5 caching strategies
+├── manifest.json           # Web App Manifest for Add-to-HomeScreen & PWA installation
+├── capacitor.config.json   # Capacitor runtime configuration for Android platform
+├── build-apk.bat           # One-click Gradle compilation & packaging script for Windows
+├── android/                # Full Native Android Studio project structure
+│   ├── app/
+│   │   ├── src/main/AndroidManifest.xml  # Native Android permissions (Camera, Location, Internet)
+│   │   └── build.gradle                   # Module build rules & Java 17 compatibility config
+│   └── build.gradle                       # Top-level Gradle configuration & subprojects setup
+├── TECHNICAL_REPORT.md     # Technical project report
+└── README.md               # Complete setup, Google Apps Script Webhook & execution guide
 ```
 
-### 🔄 Luồng Quản lý Trạng thái (Offline-First State Flow)
-1. **Khởi tạo dữ liệu**: Người dùng nhập form khảo sát ➔ Hệ thống kiểm tra dữ liệu ➔ Nén ảnh chụp qua Canvas (<800px) ➔ Lấy tọa độ GPS hiện tại.
-2. **Ghi đĩa cục bộ (IndexedDB)**: Báo cáo được lưu trực tiếp vào Object Store `surveys` với trạng thái mặc định `pending_sync` (Chờ đồng bộ).
-3. **Engine Đồng bộ Cloud**: Khi thiết bị có mạng (`navigator.onLine = true`) và đã lưu URL Webhook Google Apps Script, hệ thống gửi request `fetch()` dạng JSON tới Web App URL.
-4. **Cập nhật trạng thái**: Khi nhận phản hồi thành công, phiếu khảo sát chuyển trạng thái `synced` và cập nhật biểu tượng Badging API trên ứng dụng.
+### 🔄 State Management & Offline-First Flow
+1. **Form Input & Media Processing**: The user fills out a facility inspection report, captures a picture via HTML5 Camera API (compressed via Canvas to <800px Base64), and auto-detects GPS coordinates.
+2. **Local Storage Execution**: Data is committed to IndexedDB (`surveys` ObjectStore) under status `pending_sync`.
+3. **Synchronization Engine**: When `navigator.onLine` evaluates to `true`, the sync engine iterates through `pending_sync` entries, transmitting JSON payloads via HTTP POST to the configured Google Apps Script Webhook.
+4. **State Transition & UI Feedback**: Successfully transmitted entries transition to state `synced`. App badges and UI list indicators update dynamically.
 
-### 🛡️ Chiến lược Xử lý Ngoại lệ (Exception Handling)
-- **Ngoại lệ Ngoại mạng (Offline Fallback)**: Geolocation API tự động chuyển sang tọa độ giả lập Campus VKU (15.9753, 108.2524) khi mất GPS hoặc người dùng từ chối quyền.
-- **An toàn Giao dịch IndexedDB**: Mọi giao dịch đọc/ghi CSDL đều được bọc trong Promise với cơ chế tự động rollback khi gặp lỗi `onerror`.
-- **Service Worker Resilience**: Mọi lỗi truy vấn mạng trong `sw.js` đều tự động fallback về CacheStorage tĩnh mà không gây treo ứng dụng.
-
----
-
-## 4. MINH CHỨNG THỰC NGHIỆM & HÌNH ẢNH MINH HỌA
-
-### 📍 Minh chứng 1: Repository Mã nguồn & Deploy trên GitHub Pages
-*Ứng dụng được quản lý mã nguồn công khai tại Repository `Trieuoiu123/lab1` và tự động triển khai thành công qua GitHub Pages.*
-
-*Hình 1: Mã nguồn dự án VKU Field Survey PWA được lưu trữ và Deploy thành công trên GitHub.*
+### 🛡️ Exception Handling Strategies
+- **GPS Fallback**: If Geolocation is unavailable or denied by the user, the app gracefully falls back to default VKU Campus coordinates (`15.9753, 108.2524`).
+- **Network Request Failures**: HTTP requests timeout gracefully without throwing uncaught errors; items remain securely queued in IndexedDB until reconnection.
+- **IndexedDB Transaction Integrity**: Database operations are wrapped in Promises with automatic transaction rollback upon failure.
 
 ---
 
-### 📍 Minh chứng 2: Giao diện Form Khảo Sát Cơ Sở Vật Chất (Mobile-First UI)
-*Giao diện nhập liệu tối ưu di động với các ô chọn khu vực VKU, mã phòng, loại thiết bị, nút đánh giá tình trạng trực quan (🟢 Bình thường, 🟡 Hỏng nhẹ, 🔴 Hỏng nặng) và các nút thao tác cảm ứng lớn.*
+## 4. EMPIRICAL EVIDENCE & SCREENSHOTS
 
-*Hình 2: Giao diện Form Khảo sát Cơ sở Vật chất chuẩn Mobile-First chạy trực tuyến trên GitHub Pages.*
+### 📷 Screenshot 1: Mobile-First Inspection Form & Hardware Access (GPS & Camera)
+*The primary survey form showing VKU building zone selectors, equipment condition pills, real-time GPS coordinate acquisition, and responsive camera photo capture.*
 
----
-
-### 📍 Minh chứng 3: Tích hợp Đồng bộ Google Sheets Thời Gian Thực (Real-time Sync)
-*Giao diện Tab Đồng bộ & Hệ thống hỗ trợ dán URL Webhook Google Apps Script (`https://script.google.com/macros/s/.../exec`), lưu cấu hình và kích hoạt nút đồng bộ dữ liệu trực tiếp về trang tính Google Sheets.*
-
-*Hình 3: Cấu hình Webhook Google Apps Script tự động đồng bộ dữ liệu khảo sát vào Google Sheets.*
+> **[Screenshot 1 Placeholder: Mobile Viewport & Survey Form]**
 
 ---
 
-## 5. THÁCH THỨC KỸ THUẬT & GIẢI PHÁP
+### 📷 Screenshot 2: Real-time Cloud Synchronization (Google Sheets Webhook)
+*The Settings & Sync Tab displaying Webhook URL configuration (`https://script.google.com/macros/s/.../exec`), real-time synchronization status, and live spreadsheet row insertion.*
 
-### ⚠️ Thách thức 1: Lỗi CORS & Preflight Check khi gửi dữ liệu sang Google Apps Script
-- **Vấn đề nghẽn**: Khi sử dụng `fetch()` với `headers: { 'Content-Type': 'application/json' }` từ PWA sang đường link `script.google.com`, trình duyệt sẽ phát sinh lệnh kiểm tra CORS preflight `OPTIONS` làm Google Apps Script từ chối kết nối và không nhận được dữ liệu.
-- **Giải pháp**: Điều chỉnh phương thức gửi trong `app.js` sử dụng `mode: 'no-cors'` kết hợp `headers: { 'Content-Type': 'text/plain;charset=utf-8' }`. Phía Google Apps Script trong hàm `doPost(e)` dùng `JSON.parse(e.postData.contents)` để đọc dữ liệu sạch 100% không bị chặn bởi CORS.
+> **[Screenshot 2 Placeholder: Real-time Google Sheets Sync Interface]**
 
-### ⚠️ Thách thức 2: Trình duyệt lưu Cache Service Worker cũ không cập nhật giao diện mới
-- **Vấn đề nghẽn**: Do ứng dụng PWA có tính năng lưu bộ nhớ đệm Offline mạnh mẽ, khi đẩy code mới (tính năng Google Sheets) lên GitHub Pages, trình duyệt người dùng vẫn ưu tiên tải `index.html` cũ từ Service Worker CacheStorage.
-- **Giải pháp**: Cập nhật chỉ số phiên bản Cache `const CACHE_VERSION = 'vku-survey-v1.0.1'` trong file `sw.js`. Trong sự kiện `activate`, Service Worker sẽ tự động quét và xóa toàn bộ bộ nhớ cache cũ (`caches.delete()`), ép trình duyệt cập nhật tức thì phiên bản mới nhất.
+---
+
+### 📷 Screenshot 3: Native Android Packaging & APK Build Confirmation
+*Output terminal showing successful Gradle compilation (`BUILD SUCCESSFUL`) and generation of `android/app/build/outputs/apk/debug/app-debug.apk` via Capacitor 7.*
+
+> **[Screenshot 3 Placeholder: Android APK Compilation Success]**
+
+---
+
+## 5. TECHNICAL CHALLENGES & RESOLUTIONS
+
+### ⚠️ Challenge 1: Android Gradle Plugin (AGP 8.x) Java Version Mismatch
+- **Bottleneck**: When building the Android APK via Gradle, the build failed with `Android Gradle plugin requires Java 17 to run. You are currently using Java 11`, and subsequently failed with `invalid source release: 21` due to incomplete JRE paths.
+- **Resolution**: Updated `android/build.gradle` with a `subprojects` configuration block forcing `JavaVersion.VERSION_17` compatibility across all modules (`:app`, `:capacitor-android`, `:capacitor-cordova-android-plugins`) and configured `JAVA_HOME` in `build-apk.bat` to point to a complete OpenJDK 20 JDK path containing `jlink.exe` and `javac.exe`.
+
+### ⚠️ Challenge 2: CORS Preflight Blockage with Google Apps Script Webhook
+- **Bottleneck**: Sending JSON payloads via standard `fetch()` with header `'Content-Type': 'application/json'` triggered browser CORS preflight `OPTIONS` requests, which Google Apps Script web app URLs do not support natively, causing sync failures.
+- **Resolution**: Refactored `app.js` sync fetch logic to use `mode: 'no-cors'` with `'Content-Type': 'text/plain;charset=utf-8'`. In the Google Apps Script backend `doPost(e)`, the payload is parsed via `JSON.parse(e.postData.contents)`, bypassing CORS checks completely while maintaining 100% data fidelity.
